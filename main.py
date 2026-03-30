@@ -11,6 +11,16 @@ import pyttsx3
 import pvporcupine
 import pyaudio
 
+'''
+  Tu dici "picovoice"                                                                                                                                                                   → Jarvis: "Al tuo servizio Sir"
+    → Registra quello che dici                                                                                                                                                      
+    → Stampa a schermo la trascrizione                      
+    → Fine
+
+'''
+
+
+
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"  # evita conflitti runtime OpenMP
 
 FOLDER_PRJ  = "D:\\Python_Projects\\ML_&_OpenCV_Projects\\ownprj_FasterWhisepr_AIaudio"
