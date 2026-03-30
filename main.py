@@ -13,20 +13,17 @@ import pyaudio
 
 '''
   Tu dici "picovoice"                                                                                                                                                                   → Jarvis: "Al tuo servizio Sir"
-    → Registra quello che dici                                                                                                                                                      
-    → Stampa a schermo la trascrizione                      
-    → Fine
-
+    -> registra quello che dici                                                                                                                                                      
+    -> stampa a schermo la trascrizione                      
+    -> fine
 '''
-
-
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"  # evita conflitti runtime OpenMP
 
 FOLDER_PRJ  = "D:\\Python_Projects\\ML_&_OpenCV_Projects\\ownprj_FasterWhisepr_AIaudio"
 ACCESS_KEY  = "qrazoc171FxIZT+fqWFnzGOI7lstTvWmDotAFB2hExzckjtM+h+Z3w=="  # verifica online Picovoice
 WAKE_WORD   = "picovoice"
-SAMPLE_RATE = 16000   # Hz — richiesto da Porcupine, ottimale anche per Whisper
+SAMPLE_RATE = 16000   # Hz — richiesto da Porcupine, perfect anche per Whisper
 
 
 class JarvisAssistant:
@@ -34,17 +31,17 @@ class JarvisAssistant:
     def __init__(self, access_key=ACCESS_KEY, model_size="large-v3"):
         self.sample_rate = SAMPLE_RATE
 
-        # --- Whisper (STT) ---
+        #Whisper (STT)
         print("Caricamento modello Whisper (prima volta può richiedere qualche minuto)...")
         self.model = WhisperModel(model_size, device="cpu", compute_type="int8")
         print("Modello caricato.")
 
-        # --- TTS (pyttsx3 inizializzato una volta sola) ---
+        #TTS (pyttsx3 inizializzato una volta sola)
         self.tts = pyttsx3.init()
         self.tts.setProperty("rate", 150)
         self._set_italian_voice()
 
-        # --- Porcupine (wake word) ---
+        #Porcupine (wake word)
         self.porcupine = pvporcupine.create(
             access_key=access_key,
             keywords=[WAKE_WORD]
@@ -52,7 +49,7 @@ class JarvisAssistant:
         self.pa = pyaudio.PyAudio()
         self.audio_stream = self._open_porcupine_stream()
 
-    # ------------------------------------------------------------------ setup
+    #setup
 
     def _open_porcupine_stream(self):
         return self.pa.open(
@@ -70,33 +67,33 @@ class JarvisAssistant:
                 return
         print("Nessuna voce italiana trovata, uso voce di default.")
 
-    # ------------------------------------------------------------------ TTS
+    #TTS
 
     def speak(self, text):
         print(f"Jarvis: {text}")
         self.tts.say(text)
         self.tts.runAndWait()
 
-    # ------------------------------------------------------------------ STT
+    #STT
 
     def _transcribe_wav(self, wav_path):
-        """Trascrive un file .wav con faster-whisper."""
+        #trascrive un file .wav con faster-whisper
         segments, _ = self.model.transcribe(wav_path, beam_size=5)
         return " ".join(seg.text for seg in segments).strip()
 
     def convert_mp3_to_wav(self, mp3_path, wav_path):
-        """Utility: converte un file MP3 in WAV al sample rate corretto."""
+        #converte un file MP3 in WAV al sample rate corretto
         audio = AudioSegment.from_mp3(mp3_path)
         audio = audio.set_frame_rate(self.sample_rate)
         audio.export(wav_path, format="wav")
         print(f"Convertito: {mp3_path} → {wav_path}")
 
-    # ------------------------------------------------------------------ registrazione
+    #registrazione
 
     def _record_until_silence(self, max_duration=10.0, silence_threshold=0.01, silence_duration=1.5):
         """
-        Registra a chunk da 0.5s finché non rileva silenzio per `silence_duration` secondi
-        oppure si raggiunge `max_duration`. Restituisce un array numpy float32.
+        registra a chunk da 0.5s finché non rileva silenzio per `silence_duration` secondi
+        oppure si raggiunge `max_duration`. Return array numpy float32.
         """
         chunk_sec      = 0.5
         chunk_size     = int(self.sample_rate * chunk_sec)
@@ -121,7 +118,7 @@ class JarvisAssistant:
 
         return numpy.vstack(recording)
 
-    # ------------------------------------------------------------------ wake word
+    #wake word
 
     def _check_wake_word(self):
         """Legge un frame dal microfono e restituisce True se la wake word è rilevata."""
@@ -129,7 +126,7 @@ class JarvisAssistant:
         pcm = struct.unpack_from("h" * self.porcupine.frame_length, pcm)
         return self.porcupine.process(pcm) >= 0
 
-    # ------------------------------------------------------------------ loop principale
+    #main principale
 
     def run(self):
         print(f"\nJarvis pronto — di' '{WAKE_WORD}' per attivarlo  |  Ctrl+C per uscire\n")
@@ -138,7 +135,7 @@ class JarvisAssistant:
                 if self._check_wake_word():
                     print("[Wake word rilevata]")
 
-                    #stoppa lo stream PyAudio per liberare il microfono a sounddevice
+                    #stop stream PyAudio per liberare il microfono a sounddevice
                     self.audio_stream.stop_stream()
 
                     self.speak("Al tuo servizio Sir")
@@ -164,7 +161,7 @@ class JarvisAssistant:
         finally:
             self._cleanup()
 
-    # ------------------------------------------------------------------ cleanup
+    #cleanup
 
     def _cleanup(self):
         if self.audio_stream:
