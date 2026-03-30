@@ -18,7 +18,7 @@ import pyaudio
     -> fine
 '''
 
-os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"  # evita conflitti runtime OpenMP
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"  #evita conflitti runtime OpenMP
 
 FOLDER_PRJ  = "D:\\Python_Projects\\ML_&_OpenCV_Projects\\ownprj_FasterWhisepr_AIaudio"
 ACCESS_KEY  = "qrazoc171FxIZT+fqWFnzGOI7lstTvWmDotAFB2hExzckjtM+h+Z3w=="  # verifica online Picovoice
